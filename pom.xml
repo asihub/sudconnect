@@ -30,6 +30,7 @@
 		<java.version>17</java.version>
         <hapi.version>7.0.0</hapi.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <hapi-fhir.version>8.8.0</hapi-fhir.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,22 +85,27 @@
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
-            <version>7.0.0</version>
+            <version>${hapi-fhir.version}</version>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-r4</artifactId>
-            <version>7.0.0</version>
+            <version>${hapi-fhir.version}</version>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-validation</artifactId>
-            <version>7.0.0</version>
+            <version>${hapi-fhir.version}</version>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-client</artifactId>
-            <version>7.0.0</version>
+            <version>${hapi-fhir.version}</version>
+        </dependency>
+        <!-- Liquibase -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
         <!-- MapStruct -->
         <dependency>

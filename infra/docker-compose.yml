@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sudconnect-postgres
+    environment:
+      POSTGRES_DB: sudconnect
+      POSTGRES_USER: sudconnect
+      POSTGRES_PASSWORD: sudconnect
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

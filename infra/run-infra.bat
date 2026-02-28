@@ -1,0 +1,1 @@
+podman compose -p sudconnect-infra up -d
