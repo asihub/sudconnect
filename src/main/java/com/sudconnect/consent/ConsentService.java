@@ -1,5 +1,6 @@
 package com.sudconnect.consent;
 
+import com.sudconnect.audit.AuditLogger;
 import com.sudconnect.model.ConsentRecord;
 import com.sudconnect.repository.ConsentRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,8 @@ import java.util.List;
 public class ConsentService {
 
   private final ConsentRepository consentRepository;
+  private final AuditLogger auditLogger;
 
-  /**
-   * Validates that a valid 42 CFR Part 2 compliant consent exists
-   * before any SUD data is disclosed.
-   */
   public ConsentValidationResult validate(
       String patientId,
       String recipientOrganizationId,
@@ -34,6 +32,8 @@ public class ConsentService {
             patientId, recipientOrganizationId, disclosureType);
 
     if (consent.isEmpty()) {
+      auditLogger.logConsentDenied(patientId, recipientOrganizationId,
+          "No active consent found for this disclosure");
       return ConsentValidationResult.denied("No active consent found for this disclosure");
     }
 
@@ -41,9 +41,12 @@ public class ConsentService {
 
     if (record.getExpiresAt().isBefore(LocalDateTime.now())) {
       deactivateExpiredConsent(record);
+      auditLogger.logConsentExpired(patientId, record.getId());
+      auditLogger.logConsentDenied(patientId, recipientOrganizationId, "Consent has expired");
       return ConsentValidationResult.denied("Consent has expired");
     }
 
+    auditLogger.logConsentValidated(patientId, recipientOrganizationId, record.getId());
     log.info("Consent validated successfully for patient={}", patientId);
     return ConsentValidationResult.approved(record);
   }
@@ -54,7 +57,10 @@ public class ConsentService {
         consent.getPatientId(),
         consent.getRecipientOrganizationId(),
         consent.getDisclosureType());
-    return consentRepository.save(consent);
+    var saved = consentRepository.save(consent);
+    auditLogger.logConsentGranted(consent.getPatientId(),
+        consent.getRecipientOrganizationId(), saved.getId());
+    return saved;
   }
 
   @Transactional
@@ -62,8 +68,8 @@ public class ConsentService {
     consentRepository.findById(consentId).ifPresent(consent -> {
       consent.setActive(false);
       consentRepository.save(consent);
-      log.info("Consent revoked: id={}, patient={}",
-          consentId, consent.getPatientId());
+      auditLogger.logConsentRevoked(consent.getPatientId(), consentId);
+      log.info("Consent revoked: id={}, patient={}", consentId, consent.getPatientId());
     });
   }
 
@@ -82,6 +88,7 @@ public class ConsentService {
   private void deactivateExpiredConsent(ConsentRecord record) {
     record.setActive(false);
     consentRepository.save(record);
+    auditLogger.logConsentExpired(record.getPatientId(), record.getId());
     log.warn("Deactivated expired consent: id={}, patient={}",
         record.getId(), record.getPatientId());
   }

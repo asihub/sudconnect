@@ -6,5 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <include file="../sql/sudc-0001-01.sql" relativeToChangelogFile="true"/>
+    <include file="../sql/sudc-0002-01.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

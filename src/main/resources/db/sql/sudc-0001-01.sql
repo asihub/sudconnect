@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset dev:sudc-0001-01
+--changeset sudconnect:sudc-0001-01
 
 CREATE TABLE consent_records (
     id VARCHAR(36) NOT NULL,
