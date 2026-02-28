@@ -1,0 +1,11 @@
+{
+  "patientId": "patient-001",
+  "recipientOrganizationId": "org-housing-001",
+  "disclosureType": "TREATMENT",
+  "consentGrantedAt": "2026-02-28T10:00:00",
+  "expiresAt": "2027-02-28T10:00:00",
+  "active": true,
+  "authorizedBy": "dr-smith",
+  "purposeOfDisclosure": "SDOH coordination",
+  "permittedDataCategories": "HOUSING,FOOD,TRANSPORTATION"
+}
