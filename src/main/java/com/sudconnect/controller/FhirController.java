@@ -5,6 +5,7 @@ import com.sudconnect.consent.ConsentService;
 import com.sudconnect.fhir.FhirBundleBuilder;
 import com.sudconnect.fhir.SdohNeed;
 import com.sudconnect.fhir.SdohScreeningData;
+import com.sudconnect.filter.MinimumNecessaryFilter;
 import com.sudconnect.model.ConsentRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class FhirController {
   private final FhirBundleBuilder fhirBundleBuilder;
   private final ConsentService consentService;
   private final AuditLogger auditLogger;
+  private final MinimumNecessaryFilter minimumNecessaryFilter;
 
   @PostMapping("/bundle/{patientId}")
   public ResponseEntity<String> buildBundle(
@@ -28,7 +30,6 @@ public class FhirController {
       @RequestParam ConsentRecord.DisclosureType disclosureType,
       @RequestBody List<String> needs) {
 
-    // Validate consent before building bundle
     var validation = consentService.validate(patientId, recipientOrganizationId, disclosureType);
 
     if (!validation.isValid()) {
@@ -36,7 +37,6 @@ public class FhirController {
       return ResponseEntity.status(403).body(validation.getReason());
     }
 
-    // Map requested needs to SdohNeed objects
     var sdohNeeds = needs.stream()
         .map(this::mapNeed)
         .filter(need -> need != null)
@@ -54,9 +54,16 @@ public class FhirController {
         screeningData
     );
 
-    auditLogger.logDataDisclosed(patientId, recipientOrganizationId, String.join(",", needs));
+    // Apply minimum necessary filter
+    var filteredBundle = minimumNecessaryFilter.filter(bundle, validation.getConsentRecord());
 
-    return ResponseEntity.ok(fhirBundleBuilder.bundleToJson(bundle));
+    auditLogger.logDataDisclosed(patientId, recipientOrganizationId, String.join(",", needs));
+    auditLogger.logDataFiltered(patientId,
+        "Applied minimum necessary filter, " +
+            (bundle.getEntry().size() - filteredBundle.getEntry().size()) +
+            " entries removed");
+
+    return ResponseEntity.ok(fhirBundleBuilder.bundleToJson(filteredBundle));
   }
 
   private SdohNeed mapNeed(String need) {
