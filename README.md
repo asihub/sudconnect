@@ -138,12 +138,12 @@ Once running, open Swagger UI: [http://localhost:8080/swagger-ui/index.html](htt
 - [x] Immutable audit logging
 - [x] FHIR Bundle builder (Patient, Consent, Observation, ServiceRequest)
 - [ ] SDOH Router
-- [ ] Python SDK
 - [ ] AHC-HRSN screening support
 - [ ] PRAPARE screening support
 - [ ] Reference integration with Epic Sandbox
 - [ ] HL7 SDOH Clinical Care IG conformance testing
 - [ ] Live demo deployment
+- [ ] Column-level encryption for sensitive fields (patientId, permittedDataCategories)
 
 ---
 
