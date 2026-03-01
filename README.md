@@ -71,12 +71,18 @@ sudconnect-python/
 └── cli/              # Command-line tools for integration testing
 ```
 
-### Infrastructure (AWS)
+### Infrastructure
 
-- API Gateway + Lambda for serverless deployment option
-- RDS (PostgreSQL) for consent registry
-- CloudWatch for audit log persistence
-- KMS for encryption at rest
+**Current (local development):**
+```bash
+# Start PostgreSQL
+cd infra && docker-compose up -d
+
+# Run the app
+./mvnw spring-boot:run
+```
+
+**Production blueprint:** AWS ECS + RDS PostgreSQL + CloudWatch. Alternative hosted options: Render.com, Railway.app.
 
 ---
 
@@ -111,16 +117,16 @@ SUDConnect is designed with compliance as a core requirement, not an afterthough
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/sudconnect.git
+git clone https://github.com/asihub/sudconnect.git
 
-# Run with Docker
-docker-compose up
+# Start PostgreSQL
+cd infra && docker-compose up -d
 
-# Or build from source (requires Java 17+)
+# Run from project root (requires Java 17+)
 ./mvnw spring-boot:run
 ```
 
-Full documentation: [docs/getting-started.md](docs/getting-started.md)
+Once running, open Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ---
 
@@ -128,12 +134,16 @@ Full documentation: [docs/getting-started.md](docs/getting-started.md)
 
 - [x] Core FHIR R4 data models
 - [x] 42 CFR Part 2 consent engine (v1)
-- [ ] HAPI FHIR Server integration
+- [x] Minimum necessary data filter
+- [x] Immutable audit logging
+- [x] FHIR Bundle builder (Patient, Consent, Observation, ServiceRequest)
+- [ ] SDOH Router
 - [ ] Python SDK
 - [ ] AHC-HRSN screening support
 - [ ] PRAPARE screening support
 - [ ] Reference integration with Epic Sandbox
 - [ ] HL7 SDOH Clinical Care IG conformance testing
+- [ ] Live demo deployment
 
 ---
 
@@ -161,4 +171,4 @@ Apache 2.0 — free to use, modify, and deploy in your organization.
 
 ## Contact
 
-For questions, pilot partnerships, or integration support: [open an issue](https://github.com/your-org/sudconnect/issues)
+For questions, pilot partnerships, or integration support: [open an issue](https://github.com/asihub/sudconnect/issues)
